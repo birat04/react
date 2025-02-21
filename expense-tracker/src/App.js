@@ -1,21 +1,21 @@
-import { useState } from "react";
-import ExpenseForm from "./components/ExpenseForm";
-import ExpenseList from "./components/ExpenseList";
-import "./App.css";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
 
 function App() {
-  const [expenses, setExpenses] = useState([]);
-
-  const addExpenseHandler = (expense) => {
-    setExpenses((prevExpenses) => [...prevExpenses, expense]);
-  };
-
   return (
-    <div>
-      <h1>Expense Tracker</h1>
-      <ExpenseForm onAddExpense={addExpenseHandler} />
-      <ExpenseList expenses={expenses} />
-    </div>
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<Dashboard />} />
+      </Routes>
+    </Router>
   );
 }
 

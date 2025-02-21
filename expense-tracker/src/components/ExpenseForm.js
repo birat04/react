@@ -1,46 +1,32 @@
-import { useState } from "react";
+import React, { useState } from 'react';
+import axios from 'axios';
 
-const ExpenseForm = ({ onAddExpense }) => {
-  const [expense, setExpense] = useState({
-    title: "",
-    amount: "",
-    date: "",
-    category: "",
-  });
+const ExpenseForm = () => {
+  const [formData, setFormData] = useState({ title: '', amount: '', category: '' });
 
-  const handleChange = (e) => {
-    setExpense({ ...expense, [e.target.name]: e.target.value });
-  };
+  const { title, amount, category } = formData;
 
-  const handleSubmit = (e) => {
+  const onChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const onSubmit = async (e) => {
     e.preventDefault();
-    if (!expense.title || !expense.amount || !expense.date || !expense.category) {
-      alert("Please fill in all fields!");
-      return;
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post('http://localhost:5000/api/expenses', formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log(res.data);
+      setFormData({ title: '', amount: '', category: '' }); // Clear form
+    } catch (err) {
+      console.error(err.response.data);
     }
-
-    onAddExpense({
-      id: crypto.randomUUID(),
-      ...expense,
-      amount: parseFloat(expense.amount),
-      date: new Date(expense.date),
-    });
-
-    setExpense({ title: "", amount: "", date: "", category: "" });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="expense-form">
-      <input type="text" name="title" value={expense.title} onChange={handleChange} placeholder="Title" />
-      <input type="number" name="amount" value={expense.amount} onChange={handleChange} placeholder="Amount" />
-      <input type="date" name="date" value={expense.date} onChange={handleChange} />
-      <select name="category" value={expense.category} onChange={handleChange}>
-        <option value="">Select Category</option>
-        <option value="Food">Food</option>
-        <option value="Transport">Transport</option>
-        <option value="Shopping">Shopping</option>
-        <option value="Other">Other</option>
-      </select>
+    <form onSubmit={onSubmit}>
+      <input type="text" name="title" value={title} onChange={onChange} placeholder="Title" required />
+      <input type="number" name="amount" value={amount} onChange={onChange} placeholder="Amount" required />
+      <input type="text" name="category" value={category} onChange={onChange} placeholder="Category" required />
       <button type="submit">Add Expense</button>
     </form>
   );

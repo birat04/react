@@ -1,16 +1,34 @@
-import ExpenseItem from './ExpenseItem';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
+const ExpenseList = () => {
+  const [expenses, setExpenses] = useState([]);
 
-const ExpenseList = ({ expenses }) => {
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5000/api/expenses', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setExpenses(res.data);
+      } catch (err) {
+        console.error(err.response.data);
+      }
+    };
+    fetchExpenses();
+  }, []);
+
   return (
-    <div className="expense-list">
-      {expenses.length === 0 ? (
-        <p>No expenses added yet.</p>
-      ) : (
-        expenses.map((expense) => (
-          <ExpenseItem key={expense.id} expense={expense} />
-        ))
-      )}
+    <div>
+      <h2>Expenses</h2>
+      <ul>
+        {expenses.map((expense) => (
+          <li key={expense._id}>
+            {expense.title} - ${expense.amount} ({expense.category})
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
